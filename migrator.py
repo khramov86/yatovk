@@ -1,0 +1,1 @@
+yandex_api_base_url = 'https://api360.yandex.net/'
