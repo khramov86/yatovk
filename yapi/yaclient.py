@@ -2,9 +2,10 @@ import requests
 import time
 import pickle
 import os
+from .structures import Department, User, Org
 
 
-class YandexApiClient:
+class Client:
     def __init__(self, client_id, client_secret) -> None:
         self.__client_id = client_id
         self.__client_secret = client_secret
@@ -13,8 +14,8 @@ class YandexApiClient:
         self.get_token()
         self.__apiheaders = {
             "Authorization": "Bearer "
-            + self.__access_token,  # OAuth-токен. Использование слова Bearer обязательно
-            "Accept-Language": "ru",  # Язык ответных сообщений
+            + self.__access_token,
+            "Accept-Language": "ru"
         }
 
 
@@ -58,8 +59,17 @@ class YandexApiClient:
         resp = requests.get(f'{self.__baseurl}/directory/v1/org', headers=self.__apiheaders)
         return resp.json()
     
+    def get_org_by_name(self, **args):
+        if ['name'] not in args:
+            raise "Args should be defined"
+        name = args.get('name')
+    
     def get_orgstructures(self):
         pass
     
     def get_persons(self):
         pass
+    
+
+
+

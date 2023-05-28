@@ -14,4 +14,6 @@
 
     https://yandex.ru/dev/id/doc/ru/codes/code-url
 
+    https://yandex.ru/dev/api360/doc/ref/OrganizationsService/OrganizationsService_List.html
+
 * Описание API Mail
