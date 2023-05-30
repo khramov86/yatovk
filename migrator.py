@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import requests
 import os
 import base64
@@ -14,5 +15,5 @@ YA_CLIENT_SECRET = os.getenv("YA_CLIENT_SECRET")
 
 
 yaclient = Client(YA_CLIENT_ID, YA_CLIENT_SECRET)
-orgs = yaclient.get_orgs()
-print(orgs)
+org = yaclient.get_org_by_name('infolinkcomp.ru')
+print(org)

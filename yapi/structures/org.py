@@ -1,4 +1,11 @@
+from dataclasses import dataclass
+
+@dataclass
 class Org:
-    def __init__(self):
-        pass
-    
+    id: int
+    name: str
+    email: str
+    phone: str
+    fax: str
+    language: str
+    subscriptionPlan: str

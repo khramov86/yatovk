@@ -3,6 +3,8 @@ import time
 import pickle
 import os
 from .structures import Department, User, Org
+from tempfile import gettempdir
+from os import path
 
 
 class Client:
@@ -13,20 +15,20 @@ class Client:
         self.__baseurl = "https://api360.yandex.net"
         self.get_token()
         self.__apiheaders = {
-            "Authorization": "Bearer "
-            + self.__access_token,
-            "Accept-Language": "ru"
+            "Authorization": "Bearer " + self.__access_token,
+            "Accept-Language": "ru",
         }
 
-
     def write_token_cache(self, data, filename="token_cache"):
-        with open(filename, "wb") as file:
+        filepath = path.join(gettempdir(), filename)
+        with open(filepath, "wb") as file:
             pickle.dump(data, file)
 
     def read_token_cache(self, filename="token_cache"):
-        if not os.path.isfile(filename) or os.stat(filename).st_size == 0:
+        filepath = path.join(gettempdir(), filename)
+        if not os.path.isfile(filepath) or os.stat(filepath).st_size == 0:
             return None
-        with open(filename, "rb") as file:
+        with open(filepath, "rb") as file:
             data = pickle.load(file)
             if time.time() - data.get("timestamp") < data.get("expires_in"):
                 return data
@@ -51,25 +53,24 @@ class Client:
             )
             auth = {**resp.json(), "timestamp": time.time()}
             self.write_token_cache(auth)
-        self.__access_token = auth.get('access_token')
+        self.__access_token = auth.get("access_token")
         self.__auth = auth
         return auth
 
     def get_orgs(self):
-        resp = requests.get(f'{self.__baseurl}/directory/v1/org', headers=self.__apiheaders)
+        resp = requests.get(
+            f"{self.__baseurl}/directory/v1/org", headers=self.__apiheaders
+        )
         return resp.json()
-    
-    def get_org_by_name(self, **args):
-        if ['name'] not in args:
-            raise "Args should be defined"
-        name = args.get('name')
-    
+
+    def get_org_by_name(self, name):
+        orgs = self.get_orgs()
+        for org in orgs['organizations']:
+            if org['name'] == name:
+                return Org(**org)
+
     def get_orgstructures(self):
         pass
-    
+
     def get_persons(self):
         pass
-    
-
-
-
