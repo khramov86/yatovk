@@ -2,7 +2,7 @@ import requests
 import time
 import pickle
 import os
-from .structures import Department, User, Org
+from .structures import Department, User, Org, OrgList
 from tempfile import gettempdir
 from os import path
 
@@ -61,16 +61,25 @@ class Client:
         resp = requests.get(
             f"{self.__baseurl}/directory/v1/org", headers=self.__apiheaders
         )
-        return resp.json()
+        orgs = OrgList([])
+        for item in resp.json().get('organizations', []):
+            org = Org(item.get('id'), item.get('name'), item.get('email'), item.get('phone'), item.get('fax'), item.get('language'), item.get('subscriptionPlan'))
+            orgs.add_org(org)
+        return orgs
 
     def get_org_by_name(self, name):
-        orgs = self.get_orgs()
-        for org in orgs['organizations']:
-            if org['name'] == name:
-                return Org(**org)
+        orgs = self.get_orgs().orgs
+        for org in orgs:
+            if org.name == name:
+                return org
 
     def get_orgstructures(self):
         pass
 
-    def get_persons(self):
-        pass
+    def get_users_by_org_name(self, name):
+        org = self.get_org_by_name(name)
+        org_id = org.id
+        resp = requests.get(
+            f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders
+        )
+        return resp.json()

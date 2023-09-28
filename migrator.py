@@ -2,6 +2,7 @@
 import os
 from dotenv import load_dotenv
 from yapi.yaclient import Client
+from pprint import pprint
 
 load_dotenv()
 
@@ -9,7 +10,16 @@ load_dotenv()
 YA_CLIENT_ID = os.getenv("YA_CLIENT_ID")
 YA_CLIENT_SECRET = os.getenv("YA_CLIENT_SECRET")
 
+if YA_CLIENT_ID is None or YA_CLIENT_SECRET is None:
+    raise ValueError(
+        "YA_CLIENT_ID и YA_CLIENT_SECRET должны быть определены\n\
+                    перейдите по ссылки для генерации https://yandex.ru/dev/api360/doc/concepts/access.html"
+    )
 
 yaclient = Client(YA_CLIENT_ID, YA_CLIENT_SECRET)
-org = yaclient.get_org_by_name('infolinkcomp.ru')
-print(org)
+orgs = yaclient.get_orgs()
+pprint(orgs)
+org = yaclient.get_org_by_name("infolinkcomp.ru")
+users = yaclient.get_users_by_org_name("infolinkcomp.ru")
+pprint(org)
+pprint(users)
