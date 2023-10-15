@@ -14,7 +14,6 @@ class UserInfo:
 #     type: str
 #     value: str
 
-
 @dataclass
 class User:
     id: str
