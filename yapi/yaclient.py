@@ -8,11 +8,12 @@ from os import path
 
 
 class Client:
-    def __init__(self, client_id, client_secret) -> None:
+    def __init__(self, client_id, client_secret, renew_token=False) -> None:
         self.__client_id = client_id
         self.__client_secret = client_secret
         self.__login_headers = {"Content-type": "application/x-www-form-urlencoded"}
         self.__baseurl = "https://api360.yandex.net"
+        self.renew_token = renew_token
         self.get_token()
         self.__apiheaders = {
             "Authorization": "Bearer " + self.__access_token,
@@ -35,7 +36,8 @@ class Client:
             return None
 
     def get_token(self):
-        auth = self.read_token_cache()
+        if not self.renew_token:
+            auth = self.read_token_cache()
         if not auth:
             code_url = f"https://oauth.yandex.ru/authorize?response_type=code&client_id={self.__client_id}"
             auth_url = "https://oauth.yandex.ru/token"
@@ -80,6 +82,6 @@ class Client:
         org = self.get_org_by_name(name)
         org_id = org.id
         resp = requests.get(
-            f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders
+            f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders, params={'perPage': 100}
         )
         return resp.json()
