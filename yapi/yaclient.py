@@ -2,7 +2,7 @@ import requests
 import time
 import pickle
 import os
-from .structures import Department, User, Org, OrgList
+from .structures import UserInfo, User, UserList, Org, OrgList
 from tempfile import gettempdir
 from os import path
 
@@ -78,10 +78,26 @@ class Client:
     def get_orgstructures(self):
         pass
 
-    def get_users_by_org_name(self, name):
+    def get_users_by_org_name(self, name, per_page=100):
         org = self.get_org_by_name(name)
         org_id = org.id
+        users = UserList([])
         resp = requests.get(
-            f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders, params={'perPage': 100}
+            f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders, params={'perPage': per_page, 'page': 1}
         )
-        return resp.json()
+        data = resp.json()
+        pages = data.get("pages", 1)
+        users_raw = data.get('users')
+        if pages != 1:
+            for i in range(1, pages+1):
+                resp = requests.get(
+                    f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders, params={'perPage': per_page}
+                )
+            data = resp.json()
+            users_raw += data.get('users')
+        for user_raw in users_raw:
+            user_item = user_raw.get('name')
+            user_info = UserInfo(user_item.get('first'), user_item.get('last'), user_item.get('middle'))
+            user = User(user_raw.get('id'), user_raw.get('about'), user_raw.get('birthday'), user_raw.get('isEnabled'), user_raw.get('language'), user_info, user_raw.get('email'), user_raw.get('departmentId'), user_raw.get('isAdmin'))
+            users.add_user(user)
+        return users

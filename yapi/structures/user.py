@@ -20,14 +20,17 @@ class User:
     id: str
     about: str
     birthday: str
-    isRobot: bool
     isEnabled: bool
     language: str
-    name: UserInfo
+    userInfo: UserInfo
     email: str
     departmentId: 1
     isAdmin: bool
     # contacts: List[Contact]
 
-class Users:
-    userlist: List[User]
+@dataclass
+class UserList:
+    users: List[User]
+    
+    def add_user(self, user: User):
+        self.users.append(User)
