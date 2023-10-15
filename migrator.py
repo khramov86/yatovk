@@ -9,6 +9,7 @@ load_dotenv()
 
 YA_CLIENT_ID = os.getenv("YA_CLIENT_ID")
 YA_CLIENT_SECRET = os.getenv("YA_CLIENT_SECRET")
+YA_ORG = os.getenv("YA_ORG")
 
 if YA_CLIENT_ID is None or YA_CLIENT_SECRET is None:
     raise ValueError(
@@ -19,7 +20,7 @@ if YA_CLIENT_ID is None or YA_CLIENT_SECRET is None:
 yaclient = Client(YA_CLIENT_ID, YA_CLIENT_SECRET)
 orgs = yaclient.get_orgs()
 pprint(orgs)
-org = yaclient.get_org_by_name("infolinkcomp.ru")
-users = yaclient.get_users_by_org_name("infolinkcomp.ru")
+org = yaclient.get_org_by_name(YA_ORG)
+users = yaclient.get_users_by_org_name(YA_ORG)
 pprint(org)
 pprint(users)
