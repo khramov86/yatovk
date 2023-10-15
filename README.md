@@ -42,3 +42,4 @@ YA_ORG=domain.name
     https://yandex.ru/dev/api360/doc/ref/OrganizationsService/OrganizationsService_List.html
 
 * Описание API Mail
+  * https://biz.mail.ru/developer/api.html

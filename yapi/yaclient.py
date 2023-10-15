@@ -64,8 +64,16 @@ class Client:
             f"{self.__baseurl}/directory/v1/org", headers=self.__apiheaders
         )
         orgs = OrgList([])
-        for item in resp.json().get('organizations', []):
-            org = Org(item.get('id'), item.get('name'), item.get('email'), item.get('phone'), item.get('fax'), item.get('language'), item.get('subscriptionPlan'))
+        for item in resp.json().get("organizations", []):
+            org = Org(
+                item.get("id"),
+                item.get("name"),
+                item.get("email"),
+                item.get("phone"),
+                item.get("fax"),
+                item.get("language"),
+                item.get("subscriptionPlan"),
+            )
             orgs.add_org(org)
         return orgs
 
@@ -78,26 +86,42 @@ class Client:
     def get_orgstructures(self):
         pass
 
-    def get_users_by_org_name(self, name, per_page=100):
+    def get_users_by_org_name(self, name, per_page=100) -> UserList:
         org = self.get_org_by_name(name)
         org_id = org.id
         users = UserList([])
         resp = requests.get(
-            f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders, params={'perPage': per_page, 'page': 1}
+            f"{self.__baseurl}/directory/v1/org/{org_id}/users",
+            headers=self.__apiheaders,
+            params={"perPage": per_page, "page": 1},
         )
         data = resp.json()
         pages = data.get("pages", 1)
-        users_raw = data.get('users')
+        users_raw = data.get("users")
         if pages != 1:
-            for i in range(1, pages+1):
+            for page in range(1, pages + 1):
                 resp = requests.get(
-                    f"{self.__baseurl}/directory/v1/org/{org_id}/users", headers=self.__apiheaders, params={'perPage': per_page}
+                    f"{self.__baseurl}/directory/v1/org/{org_id}/users",
+                    headers=self.__apiheaders,
+                    params={"perPage": per_page, "page": page},
                 )
             data = resp.json()
-            users_raw += data.get('users')
+            users_raw += data.get("users")
         for user_raw in users_raw:
-            user_item = user_raw.get('name')
-            user_info = UserInfo(user_item.get('first'), user_item.get('last'), user_item.get('middle'))
-            user = User(user_raw.get('id'), user_raw.get('about'), user_raw.get('birthday'), user_raw.get('isEnabled'), user_raw.get('language'), user_info, user_raw.get('email'), user_raw.get('departmentId'), user_raw.get('isAdmin'))
+            user_item = user_raw.get("name")
+            user_info = UserInfo(
+                user_item.get("first"), user_item.get("last"), user_item.get("middle")
+            )
+            user = User(
+                id=user_raw.get("id"),
+                about=user_raw.get("about"),
+                birthday=user_raw.get("birthday"),
+                isEnabled=user_raw.get("isEnabled"),
+                language=user_raw.get("language"),
+                userInfo=user_info,
+                email=user_raw.get("email"),
+                departmentId=user_raw.get("departmentId"),
+                isAdmin=user_raw.get("isAdmin"),
+            )
             users.add_user(user)
         return users
